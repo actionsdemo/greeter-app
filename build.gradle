@@ -1,0 +1,98 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'checkstyle'
+
+
+mainClassName = 'hello.HelloWorld'
+
+// tag::repositories[]
+repositories {
+    mavenCentral()
+}
+// end::repositories[]
+
+// tag::jar[]
+jar {
+    archiveBaseName = 'greeter-app'
+    archiveVersion =  System.getenv("ARCHIVE_VERSION") ?: '0.0.1-SNAPSHOT'
+}
+// end::jar[]
+
+// tag::dependencies[]
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    implementation "joda-time:joda-time:2.2"
+    testImplementation "junit:junit:4.13"
+
+}
+// end::dependencies[]
+
+install {
+    repositories {
+        mavenInstaller {
+            pom.project {
+                inceptionYear '2020'
+            }
+
+            pom.whenConfigured {pom ->
+                pom.dependencies.find {dep -> dep.groupId == 'junit' && dep.artifactId == 'junit' }.optional = true
+            }
+        }
+    }
+}
+// end::install[]
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/actionsdemo/greeter-app")
+            credentials {
+                username = System.getenv("USERNAME")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            groupId = 'hello'
+            artifactId =  'greeter-app'
+            version =  System.getenv("ARCHIVE_VERSION") ?: '0.0.1-SNAPSHOT'
+
+            from(components.java)
+
+            pom {
+                name = 'Maven Actions Example'
+                description = 'An Example Maven Package published with GitHub Actions'
+                url = 'https://github.com/actionsdemo/greeter-app'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'evgenyrahman'
+                        name = 'Evgeny Rahman'
+                        email = 'evgenyrahman@github.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/actionsdemo/greeter-app.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:actionsdemo/greeter-app.git'
+                    url = 'http://github.com/actionsdemo/greeter-app'
+                }
+            }
+        }
+    }
+}
+//end:publishing[]
+
+// tag::wrapper[]
+// end::wrapper[]
