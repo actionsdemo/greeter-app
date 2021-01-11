@@ -6,4 +6,4 @@ An example of using GitHub Actions for CICD on a Java application using Gradle a
 
 The package is published to GitHub Package Registry as a Maven artifact.
 
-
+Updated on January 11, 2021
